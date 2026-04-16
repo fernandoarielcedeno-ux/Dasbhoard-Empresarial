@@ -31,6 +31,7 @@ Se utiliza la base de datos **Northwind** en SQLite para el análisis de ventas 
 
 ---
 
-## 💡 Autor
+## 👤 Autor
 
-Proyecto desarrollado como práctica de análisis de datos y visualización interactiva con Python.
+Fernando Ariel Cedeño  
+Data Analyst | Python | Streamlit  
