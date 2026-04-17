@@ -4,6 +4,7 @@ import plotly.express as px
 import sqlite3 as sql
 from fpdf import FPDF
 import tempfile
+from datetime import datetime
 
 conexion = sql.connect('Northwind.db')
 
@@ -29,7 +30,7 @@ conexion.close()
 
 st.set_page_config(page_title='DASBHOARD EMPRESARIAL', layout='wide')
 
-st.title('Analizis de ventas')
+st.title('Analisis de ventas')
 
 col1 = st.columns(1)[0]
 
@@ -41,7 +42,7 @@ fig1 = px.line(df, x='ProductName', y='TotalVendido',
 st.plotly_chart(fig1, use_container_width=True)
 
 fig2 = px.bar(df2, x='employee', y='total',
-              title='empleados con mas ventas')
+              title='Empleados con mas ventas')
 st.plotly_chart(fig2, use_container_width=True)
 
 fig3 = px.pie(df, values='TotalVendido', names='ProductName',
@@ -60,40 +61,86 @@ def generar_pdf(df, df2, fig1, fig2, fig3):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
 
+    total = df['TotalVendido'].sum()
+    top_producto = df.iloc[0]['ProductName']
+    top_empleado = df2.iloc[0]['employee']
+
+
     pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, "Reporte de Ventas", ln=True)
+    pdf.set_font("Arial", "B", 20)
+    pdf.cell(0, 12, "REPORTE DE VENTAS", ln=True, align="C")
+
+    pdf.set_font("Arial", "", 11)
+    fecha = datetime.now().strftime("%d/%m/%Y")
+    pdf.cell(0, 8, f"Fecha: {fecha}", ln=True, align="C")
+
+    pdf.ln(10)
+
+
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Indicadores", ln=True)
 
     pdf.set_font("Arial", "", 12)
-    total = df['TotalVendido'].sum()
-    pdf.cell(0, 10, f"Total vendido: {total}", ln=True)
+    pdf.cell(0, 8, f"Total ventas: {total}", ln=True)
+    pdf.cell(0, 8, f"Top producto: {top_producto}", ln=True)
+    pdf.cell(0, 8, f"Top empleado: {top_empleado}", ln=True)
+
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Top Productos", ln=True)
+
+    pdf.set_font("Arial", "B", 11)
+    pdf.cell(120, 8, "Producto", border=1)
+    pdf.cell(40, 8, "Ventas", border=1, ln=True)
+
+    pdf.set_font("Arial", "", 10)
+    for _, row in df.iterrows():
+        pdf.cell(120, 8, str(row['ProductName'])[:40], border=1)
+        pdf.cell(40, 8, str(row['TotalVendido']), border=1, ln=True)
+
+
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Empleados", ln=True)
+
+    pdf.set_font("Arial", "B", 11)
+    pdf.cell(120, 8, "Empleado", border=1)
+    pdf.cell(40, 8, "Ventas", border=1, ln=True)
+
+    pdf.set_font("Arial", "", 10)
+    for _, row in df2.iterrows():
+        pdf.cell(120, 8, str(row['employee'])[:40], border=1)
+        pdf.cell(40, 8, str(row['total']), border=1, ln=True)
+
 
     tmp1 = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
     tmp2 = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
     tmp3 = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
 
-  
     with open(tmp1.name, "wb") as f:
-        f.write(fig1.to_image(format="png"))
+        f.write(fig1.to_image(format="png", scale=3))
 
     with open(tmp2.name, "wb") as f:
-        f.write(fig2.to_image(format="png"))
+        f.write(fig2.to_image(format="png", scale=3))
 
     with open(tmp3.name, "wb") as f:
-        f.write(fig3.to_image(format="png"))
+        f.write(fig3.to_image(format="png", scale=3))
 
- 
+   
     pdf.add_page()
-    pdf.cell(0, 10, "Productos más vendidos", ln=True)
-    pdf.image(tmp1.name, w=180)
-
-    pdf.add_page()
-    pdf.cell(0, 10, "Empleados con más ventas", ln=True)
-    pdf.image(tmp2.name, w=180)
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Productos mas vendidos", ln=True)
+    pdf.image(tmp1.name, x=15, w=180)
 
     pdf.add_page()
-    pdf.cell(0, 10, "Ventas por producto", ln=True)
-    pdf.image(tmp3.name, w=180)
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Empleados", ln=True)
+    pdf.image(tmp2.name, x=15, w=180)
+
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(0, 10, "Distribucion", ln=True)
+    pdf.image(tmp3.name, x=15, w=180)
 
     pdf_path = "reporte.pdf"
     pdf.output(pdf_path)
