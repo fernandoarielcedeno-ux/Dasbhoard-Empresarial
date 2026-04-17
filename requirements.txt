@@ -4,3 +4,4 @@ plotly
 fpdf
 kaleido
 chromium
+tempfile
