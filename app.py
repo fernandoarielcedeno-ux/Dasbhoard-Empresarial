@@ -77,7 +77,6 @@ if select:
     st.dataframe(filtro, use_container_width=True)
 
 
-
 class PDF(FPDF):
     def header(self):
         self.set_fill_color(30, 60, 114)
@@ -100,8 +99,6 @@ def generar_pdf(df, df2, fig1, fig2, fig3):
     pdf.set_auto_page_break(auto=True, margin=15)
 
     total = df['TotalVendido'].sum()
-    top_producto = df.iloc[0]['ProductName']
-    top_empleado = df2.iloc[0]['employee']
 
     pdf.add_page()
 
@@ -114,17 +111,10 @@ def generar_pdf(df, df2, fig1, fig2, fig3):
     pdf.cell(0, 8, f"Fecha: {fecha}", ln=True, align="C")
 
     pdf.ln(10)
-
+    
     pdf.set_font("Arial", "B", 12)
-
     pdf.set_fill_color(220, 230, 241)
-    pdf.cell(60, 20, f"Total\n{total}", 0, 0, "C", True)
-
-    pdf.set_fill_color(198, 224, 180)
-    pdf.cell(60, 20, f"Top Producto\n{top_producto[:15]}", 0, 0, "C", True)
-
-    pdf.set_fill_color(255, 217, 102)
-    pdf.cell(60, 20, f"Top Empleado\n{top_empleado[:15]}", 0, 1, "C", True)
+    pdf.cell(0, 20, f"Total ventas\n{total}", 0, 1, "C", True)
 
     pdf.ln(10)
     pdf.set_font("Arial", "B", 14)
@@ -146,7 +136,6 @@ def generar_pdf(df, df2, fig1, fig2, fig3):
 
         pdf.cell(120, 8, str(row['ProductName'])[:40], 1, 0, fill=fill)
         pdf.cell(40, 8, str(row['TotalVendido']), 1, 1, fill=fill)
-
 
     fig1.update_layout(paper_bgcolor="white", plot_bgcolor="white")
     fig2.update_layout(paper_bgcolor="white", plot_bgcolor="white")
@@ -185,7 +174,10 @@ def generar_pdf(df, df2, fig1, fig2, fig3):
 
 
 if st.button("Generar reporte PDF"):
-    pdf_file = generar_pdf(df, df2, fig1, fig2, fig3)
+    if select:
+        pdf_file = generar_pdf(filtro, df2, fig1, fig2, fig3)
+    else:
+        pdf_file = generar_pdf(df, df2, fig1, fig2, fig3)
 
     with open(pdf_file, "rb") as f:
         st.download_button(
