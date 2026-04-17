@@ -33,7 +33,7 @@ st.title('Analisis de ventas')
 
 st.metric('Total de ventas', f"${df['TotalVendido'].sum()}", "12%")
 
-# ===== GRAFICAS CON COLOR =====
+
 fig1 = px.line(
     df,
     x='ProductName',
@@ -64,7 +64,7 @@ st.plotly_chart(fig1, use_container_width=True)
 st.plotly_chart(fig2, use_container_width=True)
 st.plotly_chart(fig3, use_container_width=True)
 
-# ===== FILTRO =====
+
 st.sidebar.header('Filtros')
 
 select = st.sidebar.multiselect(
@@ -77,7 +77,7 @@ if select:
     st.dataframe(filtro, use_container_width=True)
 
 
-# ===== PDF =====
+
 class PDF(FPDF):
     def header(self):
         self.set_fill_color(30, 60, 114)
@@ -147,7 +147,7 @@ def generar_pdf(df, df2, fig1, fig2, fig3):
         pdf.cell(120, 8, str(row['ProductName'])[:40], 1, 0, fill=fill)
         pdf.cell(40, 8, str(row['TotalVendido']), 1, 1, fill=fill)
 
-    # ===== FORZAR COLOR EN PDF =====
+
     fig1.update_layout(paper_bgcolor="white", plot_bgcolor="white")
     fig2.update_layout(paper_bgcolor="white", plot_bgcolor="white")
     fig3.update_layout(paper_bgcolor="white", plot_bgcolor="white")
