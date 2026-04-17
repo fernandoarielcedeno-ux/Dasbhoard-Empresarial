@@ -33,7 +33,7 @@ conexion.close()
 st.set_page_config(page_title='DASHBOARD EMPRESARIAL', layout='wide')
 st.title('Analisis de ventas')
 
-st.metric('Total de ventas', df['TotalVendido'].sum(),'$','12%')
+st.metric('Total de ventas', f"${df['TotalVendido'].sum()}", "12%")
 
 fig1 = px.line(df, x='ProductName', y='TotalVendido',
                title='Productos más vendidos',)
